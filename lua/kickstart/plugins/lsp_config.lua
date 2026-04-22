@@ -15,7 +15,16 @@ return {
       opts = {},
     },
     -- Maps LSP server names between nvim-lspconfig and Mason package names.
-    'mason-org/mason-lspconfig.nvim',
+    {
+      'mason-org/mason-lspconfig.nvim',
+      dependencies = { 'mason-org/mason.nvim' },
+      opts = {
+        ensure_installed = {
+          'arduino_language_server',
+          'clangd',
+        },
+      },
+    },
     'WhoIsSethDaniel/mason-tool-installer.nvim',
 
     -- Useful status updates for LSP.
@@ -89,13 +98,45 @@ return {
         end
       end,
     })
-
+    local util = require 'lspconfig.util'
     -- Enable the following language servers
     --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
     --  See `:help lsp-config` for information about keys and how to configure
     ---@type table<string, vim.lsp.Config>
     local servers = {
-      -- clangd = {},
+      clangd = {
+        filetypes = { 'c', 'cpp' },
+      },
+
+      arduino_language_server = {
+        filetypes = { 'arduino' },
+        cmd = {
+          'arduino-language-server',
+          -- '-clangd',
+          -- '/usr/local/bin/clangd',
+          -- '-cli',
+          -- '/usr/sbin/arduino-cli',
+          -- '-cli-config',
+          -- vim.fn.expand '$HOME' .. '/.arduino15/arduino-cli.yaml',
+          -- '-fqbn',
+          -- 'esp32:esp32:esp32s3',
+        },
+        capabilities = {
+          textDocument = {
+            ---@diagnostic disable-next-line: assign-type-mismatch
+            semanticTokens = vim.NIL,
+          },
+          workspace = {
+            ---@diagnostic disable-next-line: assign-type-mismatch
+            semanticTokens = vim.NIL,
+          },
+        },
+        root_dir = function(bufnr, on_dir)
+          local fname = vim.api.nvim_buf_get_name(bufnr)
+          on_dir(util.root_pattern '*.ino'(fname))
+        end,
+      },
+
       -- gopls = {},
       -- pyright = {},
       -- rust_analyzer = {},
