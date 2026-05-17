@@ -74,4 +74,4 @@ vim.o.wrap = false -- Disable line wrapping
 vim.o.cursorline = true -- Highlight the current line
 vim.o.termguicolors = true -- Enable 24-bit RGB colors
 
-vim.keymap.set('n', '<leader>r', function() vim.cmd 'split | terminal go run .' end, { desc = 'Go run in terminal' })
+vim.o.exrc = true
